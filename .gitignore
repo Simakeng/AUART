@@ -54,3 +54,7 @@ Backup*
 
 # Trash files
 *.bak
+
+# VS Code 
+.vscode/*.json
+!.vscode/c_cpp_properties.json

@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "STM32F407",
+            "includePath": [
+                "${workspaceFolder}/example/STM32F407/Core/Inc",
+                "${workspaceFolder}/example/STM32F407/Drivers/STM32F4xx_HAL_Driver/Inc",
+                "${workspaceFolder}/example/STM32F407/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy",
+                "${workspaceFolder}/example/STM32F407/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
+                "${workspaceFolder}/example/STM32F407/Drivers/CMSIS/Include",
+                "${workspaceFolder}/example/STM32F407/Drivers/",
+                "${workspaceFolder}/src/"
+            ],
+            "defines": [
+                "USE_HAL_DRIVER",
+                "STM32F407xx",
+            ],
+            /* Replace this to your compiler path. */
+            "compilerPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/12.2 mpacbti-rel1/bin/arm-none-eabi-g++.exe",
+            "cStandard": "c11",
+            "cppStandard": "gnu++11",
+            "intelliSenseMode": "windows-gcc-arm",
+            "configurationProvider": "none"
+        }
+    ],
+    "version": 4
+}
