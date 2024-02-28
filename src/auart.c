@@ -1,23 +1,37 @@
 #include "auart.h"
 #include <string.h>
 
-volatile struct 
+int auart_init(auart_t *hauart, auart_init_t *init)
 {
-    uint8_t tx_buffer[CONFIG_AUART_TX_BUFFER_SIZE];
-    uint8_t rx_buffer[CONFIG_AUART_RX_BUFFER_SIZE];
+    // argument sanity checks
+    if (hauart == NULL || init == NULL)
+        return AUART_INVALID_ARGUMENT;
 
-    uint32_t tx_head;   // rw by DMA and IRQ, ro by api
-    uint32_t tx_tail;   // ro by DMA and IRQ, rw by api
+    if (init->dma_rx_start == NULL)
+        return AUART_INVALID_ARGUMENT;
 
-    uint32_t rx_head;   // ro by DMA and IRQ, rw by api
-    uint32_t rx_tail;   // rw by DMA and IRQ, ro by api
-} auart;
+    if (init->dma_rx_update_progress == NULL)
+        return AUART_INVALID_ARGUMENT;
 
-#include <usart.h>
+#if (CONFIG_AUART_USE_TIME_API == 1)
+    if (init->get_tick_ms == NULL)
+        return AUART_INVALID_ARGUMENT;
+#endif
 
-void auart_init(void)
-{
-    memset(&auart, 0, sizeof(auart));
+    // clear the device
+    memset(hauart, 0, sizeof(auart_t));
 
-    HAL_UART_Receive_DMA(&huart1, auart.rx_buffer, CONFIG_AUART_RX_BUFFER_SIZE);
+    // copy datas
+    hauart->op = *init;
+
+    // start the rx dma
+    int res = hauart->op.dma_rx_start(
+        hauart,
+        hauart->rx_buffer,
+        CONFIG_AUART_RX_BUFFER_SIZE);
+
+    if (res < 0)
+        return res;
+
+    return AUART_OK;
 }

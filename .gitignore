@@ -31,11 +31,26 @@
 # IAR Debug List
 **/Debug/List
 
+# IAR Build Obj
+**/EWARM/**/Obj/**/*.o
+
+# IAR Settings
+**/EWARM/**/settings/**/*.*
+
+# IAR Build Output
+**/EWARM/**/Exe/**/*.out
+
+# IAR Ninja Build
+**/EWARM/**/*ninja*
+
+# IAR Browse Info
+**/EWARM/**/BrowseInfo/**/*.*
+
 # IAR Debug Obj
-**/Obj/*.pbd
-**/Obj/*.pbd.*
-**/Obj/*.pbi
-**/Obj/*.pbi.*
+**/EWARM/**/*.pbd
+**/EWARM/**/*.pbd.*
+**/EWARM/**/*.pbi
+**/EWARM/**/*.pbi.*
 
 # Log files
 **.log

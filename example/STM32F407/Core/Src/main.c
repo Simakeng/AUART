@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <auart.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,7 +45,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+extern DMA_HandleTypeDef hdma_usart1_rx;
+extern DMA_HandleTypeDef hdma_usart1_tx;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,7 +91,18 @@ int main(void)
   MX_DMA_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  static auart_init_t auart1_init = {
+      .dma_rx_start = NULL,
+      .dma_rx_update_progress = NULL,
+      .dma_rx_abort = NULL,
+      .h_rxdma = &hdma_usart1_rx,
+      .h_txdma = &hdma_usart1_tx,
+  };
 
+  static auart_t auart1;
+
+  int res = auart_init(&auart1, &auart1_init);
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
