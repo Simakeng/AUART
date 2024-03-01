@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -47,6 +47,9 @@
 /* USER CODE BEGIN PV */
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
+
+static auart_t auart1;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,7 +60,30 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+// callback of STM32 HAL
+void UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart == &huart1)
+    auart_dma_rx_cplt_callback(&auart1);
+}
 
+void UART_DMA_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart == &huart1)
+    auart_dma_rx_half_cplt_callback(&auart1);
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart == &huart1)
+    auart_tx_cplt_callback(&auart1);
+}
+
+void UART_IdleCallback(UART_HandleTypeDef *huart)
+{
+  if (huart == &huart1)
+    auart_idle_callback(&auart1);
+}
 /* USER CODE END 0 */
 
 /**
@@ -92,23 +118,31 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   static auart_init_t auart1_init = {
-      .dma_rx_start = NULL,
-      .dma_rx_update_progress = NULL,
-      .dma_rx_abort = NULL,
+      .dma_tx_start = uart_dma_tx_start,
+      .dma_rx_start = uart_dma_rx_start,
+      .dma_rx_update_progress = uart_dma_update_progress,
+      .dma_tx_abort = uart_dma_abort,
+      .dma_rx_abort = uart_dma_abort,
+      .get_tick_ms = HAL_GetTick,
       .h_rxdma = &hdma_usart1_rx,
       .h_txdma = &hdma_usart1_tx,
   };
 
-  static auart_t auart1;
-
   int res = auart_init(&auart1, &auart1_init);
-  
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    auart_tx(&auart1, "test: Hello World!\n", 19);
+    // uint8_t buffer[10];
+    // res = auart_rx(&auart1, buffer, 10);
+    // if (res > 0)
+    // {
+    //   auart_tx(&auart1, buffer, res);
+    // }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

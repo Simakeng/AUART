@@ -42,6 +42,14 @@ void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
+int uart_dma_update_progress(void *hdma, uint32_t *out_bytes_left);
+
+int uart_dma_tx_start(void *hdma, const void *psrc, uint32_t len);
+
+int uart_dma_rx_start(void *hdma, void *pdst, uint32_t len);
+
+int uart_dma_abort(void *hdma);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

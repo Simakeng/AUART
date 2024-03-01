@@ -66,6 +66,7 @@ Backup*
 *.elf
 *.hex
 *.map
+**/EWARM/**/Exe/**/*.*
 
 # Trash files
 *.bak

@@ -159,4 +159,65 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
 /* USER CODE BEGIN 1 */
 
+int uart_dma_update_progress(void *hdma, uint32_t *out_bytes_left)
+{
+  if (hdma == NULL || out_bytes_left == NULL)
+    return -1;
+
+  DMA_HandleTypeDef *hdma_uart = (DMA_HandleTypeDef *)hdma;
+
+  *out_bytes_left = hdma_uart->Instance->NDTR;
+
+  return 0;
+}
+
+int uart_dma_rx_start(void *hdma, void *pdst, uint32_t len)
+{
+  if (hdma == NULL || pdst == NULL || len == 0)
+    return -1;
+
+  // DMA_HandleTypeDef *hdma_uart = (DMA_HandleTypeDef *)hdma;
+
+  HAL_StatusTypeDef res = HAL_UART_Receive_DMA(&huart1, pdst, len);
+
+  if (res != HAL_OK)
+    return -1;
+
+  // enable IDLE interrupt to detect the end of the transfer
+  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+
+  return 0;
+}
+
+int uart_dma_tx_start(void *hdma, const void *psrc, uint32_t len)
+{
+  if (hdma == NULL || psrc == NULL || len == 0)
+    return -1;
+
+  // DMA_HandleTypeDef *hdma_uart = (DMA_HandleTypeDef *)hdma;
+
+  HAL_StatusTypeDef res = HAL_UART_Transmit_DMA(&huart1, (uint8_t *)psrc, len);
+
+  if (res != HAL_OK)
+    return -1;
+
+  return 0;
+}
+
+int uart_dma_abort(void *hdma)
+{
+  if (hdma == NULL)
+    return -1;
+
+  // DMA_HandleTypeDef *hdma_uart = (DMA_HandleTypeDef *)hdma;
+
+  // HAL_StatusTypeDef res = HAL_DMA_Abort(hdma_uart);
+  HAL_StatusTypeDef res = HAL_UART_DMAStop(&huart1);
+
+  if (res != HAL_OK)
+    return -1;
+
+  return 0;
+}
+
 /* USER CODE END 1 */
