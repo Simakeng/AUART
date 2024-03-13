@@ -211,7 +211,9 @@ void USART1_IRQHandler(void)
   // Handler code for IDLE line event
   if ((USART1->SR & USART_SR_IDLE) && (USART1->CR1 & USART_CR1_IDLEIE))
   {
-      UART_IdleCallback(&huart1);
+    if ((huart1.ReceptionType != HAL_UART_RECEPTION_TOIDLE))
+      __HAL_UART_CLEAR_IDLEFLAG(&huart1);
+    UART_IdleCallback(&huart1);
   }
 
   /* USER CODE END USART1_IRQn 0 */

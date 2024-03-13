@@ -141,8 +141,10 @@ typedef struct
     volatile uint32_t tx_head; // rw by DMA and IRQ, ro by api
     volatile uint32_t tx_tail; // ro by DMA and IRQ, rw by api
 
-    volatile uint32_t rx_head; // ro by DMA and IRQ, rw by api
-    volatile uint32_t rx_tail; // rw by DMA and IRQ, ro by api
+    volatile uint32_t rx_head;       // ro by DMA and IRQ, rw by api
+    volatile uint32_t rx_start;      // ro by DMA and IRQ, rw by api
+    volatile uint32_t rx_batch_size; // ro by DMA and IRQ, rw by api
+    volatile uint32_t rx_tail;       // rw by DMA and IRQ, ro by api
 
     /**
      * This union 'flags' is to make the flag operations atomic.
@@ -156,8 +158,6 @@ typedef struct
         int32_t is_started;
         int32_t commited_size;
     } tx_dma;
-
-    bool rx_dma_started;
 
     auart_init_t op;
 } auart_t;

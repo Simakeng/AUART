@@ -1,3 +1,14 @@
+/**
+ * @file auart.c
+ * @author simakeng (simakeng@outlook.com)
+ * @brief Asynchronous UART driver for STM32F/STM32G
+ * @version 0.1
+ * @date 2024-03-01
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
 #include "auart.h"
 #include <string.h>
 
@@ -33,7 +44,9 @@ int auart_init(auart_t *hauart, auart_init_t *init)
     int res = hauart->op.dma_rx_start(
         hauart,
         hauart->rx_buffer,
-        CONFIG_AUART_RX_BUFFER_SIZE);
+        CONFIG_AUART_RX_BUFFER_SIZE - 1);
+    hauart->rx_start = 0;
+    hauart->rx_batch_size = CONFIG_AUART_RX_BUFFER_SIZE - 1;
 
     if (res < 0)
         return res;
@@ -51,10 +64,28 @@ static inline int32_t __auart_get_capacity_in_tx_buffer(auart_t *hauart)
     return size_in_buffer;
 }
 
+static inline int32_t __auart_get_capacity_in_rx_buffer(auart_t *hauart)
+{
+    int32_t size_in_buffer = CONFIG_AUART_RX_BUFFER_SIZE;
+    size_in_buffer += hauart->rx_head;
+    size_in_buffer -= hauart->rx_tail;
+    size_in_buffer %= CONFIG_AUART_RX_BUFFER_SIZE;
+
+    return size_in_buffer;
+}
+
 static inline int32_t __auart_get_data_size_in_tx_buffer(auart_t *hauart)
 {
     int32_t size_in_buffer = __auart_get_capacity_in_tx_buffer(hauart);
     int32_t data_len = CONFIG_AUART_TX_BUFFER_SIZE - 1 - size_in_buffer;
+
+    return data_len;
+}
+
+static inline int32_t __auart_get_data_size_in_rx_buffer(auart_t *hauart)
+{
+    int32_t size_in_buffer = __auart_get_capacity_in_rx_buffer(hauart);
+    int32_t data_len = CONFIG_AUART_RX_BUFFER_SIZE - size_in_buffer;
 
     return data_len;
 }
@@ -92,7 +123,8 @@ static inline int __auart_tx_dma_continue(auart_t *hauart)
 
     if (res < 0)
         return res;
-    
+
+    // this will also mark the tx dma as started.
     hauart->tx_dma.commited_size = num_byte_to_send;
     return 0;
 }
@@ -160,11 +192,68 @@ copy_done:
     return size_to_copy;
 }
 
-int auart_rx(auart_t *hauart, void *data, int32_t len);
+int auart_rx(auart_t *hauart, void *data, int32_t len)
+{
+    //? this function is in thread context ?//
+
+    int32_t rx_head = hauart->rx_head;
+    int32_t rx_tail = hauart->rx_tail;
+
+    if (rx_head == rx_tail)
+        return 0;
+
+    int32_t size_in_buffer = CONFIG_AUART_RX_BUFFER_SIZE;
+    size_in_buffer += rx_tail;
+    size_in_buffer -= rx_head;
+    size_in_buffer %= CONFIG_AUART_RX_BUFFER_SIZE;
+
+    int32_t size_to_copy = len;
+    if (size_to_copy > size_in_buffer)
+        size_to_copy = size_in_buffer;
+
+    int32_t size_to_end = CONFIG_AUART_RX_BUFFER_SIZE;
+    size_to_end -= rx_tail;
+
+    int32_t size_first_copy = size_to_copy;
+    if (size_first_copy > size_to_end)
+        size_first_copy = size_to_end;
+
+    memcpy(data, hauart->rx_buffer + rx_head, size_first_copy);
+
+    int32_t size_second_copy = size_to_copy - size_first_copy;
+    int32_t new_head = rx_head;
+    new_head += size_to_copy;
+    new_head %= CONFIG_AUART_RX_BUFFER_SIZE;
+    if (size_second_copy == 0)
+    {
+        hauart->rx_head = new_head;
+        return size_to_copy;
+    }
+
+    memcpy((uint8_t *)data + size_first_copy, hauart->rx_buffer, size_second_copy);
+
+    hauart->rx_head = new_head;
+    return size_to_copy;
+}
 
 int auart_idle_callback(auart_t *hauart)
 {
-    return 0;
+    uint32_t rx_dma_transfers_left = 0;
+
+    int res = hauart->op.dma_rx_update_progress(
+        hauart->op.h_rxdma,
+        &rx_dma_transfers_left);
+
+    if (res < 0)
+        return res;
+
+    int32_t rx_bs = hauart->rx_batch_size;
+    int32_t rx_start = hauart->rx_start;
+    int32_t rx_cnt = rx_bs - rx_dma_transfers_left;
+    int32_t new_rx_tail = rx_start + rx_cnt;
+    new_rx_tail %= CONFIG_AUART_RX_BUFFER_SIZE;
+
+    hauart->rx_tail = new_rx_tail;
 }
 
 int auart_dma_rx_half_cplt_callback(auart_t *hauart)
