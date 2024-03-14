@@ -13,14 +13,33 @@
             ],
             "defines": [
                 "USE_HAL_DRIVER",
-                "STM32F407xx",
+                "STM32F407xx"
             ],
-            /* Replace this to your compiler path. */
             "compilerPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/12.2 mpacbti-rel1/bin/arm-none-eabi-g++.exe",
             "cStandard": "c11",
             "cppStandard": "gnu++11",
             "intelliSenseMode": "windows-gcc-arm",
             "configurationProvider": "none"
+        },
+        {
+            "name": "STM32G030",
+            "includePath": [
+                "${workspaceFolder}/example/STM32G030/Core/Inc",
+                "${workspaceFolder}/example/STM32G030/Drivers/STM32G0xx_HAL_Driver/Inc",
+                "${workspaceFolder}/example/STM32G030/Drivers/STM32G0xx_HAL_Driver/Inc/Legacy",
+                "${workspaceFolder}/example/STM32G030/Drivers/CMSIS/Device/ST/STM32G0xx/Include",
+                "${workspaceFolder}/example/STM32G030/Drivers/CMSIS/Include",
+                "${workspaceFolder}/example/STM32G030/Drivers/",
+                "${workspaceFolder}/src/"
+            ],
+            "defines": [
+                "USE_HAL_DRIVER",
+                "STM32G030xx"
+            ],
+            "compilerPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/12.2 mpacbti-rel1/bin/arm-none-eabi-g++.exe",
+            "cStandard": "c11",
+            "cppStandard": "gnu++11",
+            "intelliSenseMode": "windows-gcc-arm"
         }
     ],
     "version": 4

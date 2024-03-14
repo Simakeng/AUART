@@ -176,7 +176,13 @@ void DMA1_Channel2_3_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-
+  // Handler code for IDLE line event
+  if ((USART1->ISR & USART_ISR_IDLE) && (USART1->CR1 & USART_CR1_IDLEIE))
+  {
+    if ((huart1.ReceptionType != HAL_UART_RECEPTION_TOIDLE))
+      __HAL_UART_CLEAR_IDLEFLAG(&huart1);
+    UART_IdleCallback(&huart1);
+  }
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */

@@ -10,5 +10,5 @@
 - [X] STM32F4
 - [ ] STM32F3
 - [ ] STM32F1
-- [ ] STM32G0  (WIP)
+- [X] STM32G0
 - [ ] ESP32-C3 (maybe)
