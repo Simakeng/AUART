@@ -152,6 +152,8 @@ int auart_tx_cplt_callback(auart_t *hauart)
 
 int auart_tx(auart_t *hauart, const void *data, int32_t len)
 {
+    //? this function is in thread context ?//
+
     uint8_t *pu8data = (uint8_t *)data;
     int32_t size_in_buffer = __auart_get_capacity_in_tx_buffer(hauart);
 

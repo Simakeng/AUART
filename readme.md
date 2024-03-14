@@ -7,8 +7,8 @@
 - Non-blocking IO
 
 ## Chip Support
-- [ ] STM32F4 (WIP)
+- [X] STM32F4
 - [ ] STM32F3
 - [ ] STM32F1
-- [ ] STM32G0
+- [ ] STM32G0  (WIP)
 - [ ] ESP32-C3 (maybe)
