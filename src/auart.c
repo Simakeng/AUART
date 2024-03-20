@@ -256,6 +256,8 @@ int auart_idle_callback(auart_t *hauart)
     new_rx_tail %= CONFIG_AUART_RX_BUFFER_SIZE;
 
     hauart->rx_tail = new_rx_tail;
+    
+    return 0;
 }
 
 int auart_dma_rx_half_cplt_callback(auart_t *hauart)
